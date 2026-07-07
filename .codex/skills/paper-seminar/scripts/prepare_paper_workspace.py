@@ -58,30 +58,43 @@ def require_pdf(path: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="Local PDF path, arXiv id, arXiv URL, or PDF URL")
-    parser.add_argument("--output", default=".", help="Directory where the paper folder is created")
+    parser.add_argument("--output", default="seminars", help="Directory where paper folders are created")
     parser.add_argument("--title", help="Short or full paper title for folder naming")
     args = parser.parse_args()
 
     output = Path(args.output).expanduser().resolve()
+    if output.name != "seminars":
+        raise SystemExit("--output must point to a seminars directory")
     output.mkdir(parents=True, exist_ok=True)
 
     source = args.input.strip()
-    tmp_pdf = output / ".paper-download.tmp.pdf"
+    source_path = Path(source).expanduser()
+    fallback_title = args.title or source_path.stem or source.rstrip("/").split("/")[-1] or "paper"
+    folder = output / slugify(fallback_title)
+    folder.mkdir(parents=True, exist_ok=True)
+    partial_pdf = folder / ".paper-download.partial.pdf"
+    paper_pdf = folder / "paper.pdf"
+
     if Path(source).expanduser().exists():
-        source_pdf = Path(source).expanduser().resolve()
+        shutil.copyfile(source_path.resolve(), paper_pdf)
     else:
         pdf_url = arxiv_pdf_url(source)
-        download(pdf_url, tmp_pdf)
-        source_pdf = tmp_pdf
+        try:
+            download(pdf_url, partial_pdf)
+            partial_pdf.replace(paper_pdf)
+        finally:
+            if partial_pdf.exists():
+                partial_pdf.unlink()
 
-    require_pdf(source_pdf)
-    title = args.title or guess_title_from_pdf(source_pdf)
-    folder = output / slugify(title)
-    folder.mkdir(parents=True, exist_ok=True)
+    require_pdf(paper_pdf)
+    if not args.title:
+        guessed_folder = output / slugify(guess_title_from_pdf(paper_pdf))
+        if guessed_folder != folder and not guessed_folder.exists():
+            folder.rename(guessed_folder)
+            folder = guessed_folder
+            paper_pdf = folder / "paper.pdf"
+
     (folder / "figures").mkdir(exist_ok=True)
-    shutil.copyfile(source_pdf, folder / "paper.pdf")
-    if tmp_pdf.exists():
-        tmp_pdf.unlink()
 
     print(folder)
     return 0

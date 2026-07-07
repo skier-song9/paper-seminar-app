@@ -21,13 +21,14 @@ If the input title is unclear, infer a short title from the PDF/arXiv metadata. 
 
 ## Required Output
 
-Create one folder named from the input paper short title:
+Create one folder under `seminars/`, named from the input paper short title:
 
 ```text
-short-title/
-├── paper.pdf
-├── seminar.md
-└── figures/
+seminars/
+└── short-title/
+    ├── paper.pdf
+    ├── seminar.md
+    └── figures/
 ```
 
 Keep all figure links in `seminar.md` relative, for example `figures/method-p12.png`.
@@ -35,9 +36,12 @@ Keep all figure links in `seminar.md` relative, for example `figures/method-p12.
 ## Workflow
 
 1. Prepare the workspace.
-   - Run `scripts/prepare_paper_workspace.py <input> --output <target-dir> --title "<short title>"` when useful.
+   - Run `scripts/prepare_paper_workspace.py <input> --title "<short title>"` when useful.
+   - Keep the output under `seminars/`.
    - Save the input paper as `paper.pdf`.
    - Create `figures/`.
+   - Do not use `/tmp` during skill execution.
+   - If temporary files are needed, keep them inside the output paper folder and delete them before finishing.
 2. Read the seminar style guide.
    - Read `references/paper-review-patterns.md`.
    - Read `references/seminar-template.md`.
@@ -55,12 +59,14 @@ Keep all figure links in `seminar.md` relative, for example `figures/method-p12.
 5. Write `seminar.md` in Korean.
    - Keep technical terms in English when translation hurts precision.
    - Use the structure in `references/seminar-template.md`.
+   - Keep template labels exactly: `메타데이터`, `학습 목표`, `이 자료에서 보는 한계`.
    - Include source page numbers for important claims and every extracted visual.
    - End with expected Q&A and a short list of what still feels uncertain.
-6. During Q&A, answer as the seminar presenter.
-   - Ground answers in `paper.pdf`, `seminar.md`, and the extracted figures.
-   - If the user finds a point ambiguous, restate it with a smaller example, a diagram-level explanation, or equations.
-   - Add useful Q&A notes back into the Q&A section of `seminar.md` when the discussion changes the understanding.
+   - Before reporting completion, remove temporary files from the paper folder, including hidden partial downloads and intermediate render artifacts not referenced by `seminar.md`.
+6. During Q&A, use `$paper-qa`.
+   - Ground answers in `QA/` evidence created under the paper folder.
+   - If a point stays ambiguous, restate it with a smaller example, a diagram-level explanation, or equations.
+   - Add useful Q&A notes back into `seminar.md` when the discussion changes the understanding.
 7. When Q&A ends, ask whether to organize the result in Notion.
    - If yes, create/update the Notion page from `seminar.md` plus Q&A.
    - Use heading prefixes exactly: heading1 `◾`, heading2 `🔻`, heading3 `🔸`.

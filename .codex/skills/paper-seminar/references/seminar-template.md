@@ -5,14 +5,14 @@ Use this structure unless the paper type clearly needs the survey/series variant
 ```markdown
 # {Paper Title}
 
-## 0. 발표 메타
+## 0. 메타데이터
 
 - 논문:
 - 저자 / 소속:
 - 학회 / 연도:
 - 링크:
 - 한 줄 요약:
-- 발표 목표:
+- 학습 목표:
 
 ## 1. 먼저 이렇게 읽으면 된다
 
@@ -74,7 +74,7 @@ Use this structure unless the paper type clearly needs the survey/series variant
 ## 7. 한계와 비판
 
 - 논문이 인정한 한계:
-- 발표자가 보는 한계:
+- 이 자료에서 보는 한계:
 - 추가로 확인하면 좋은 실험:
 
 ## 8. 결론

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paper Q&A"
+  short_description: "Evidence-grounded paper Q&A"
+  default_prompt: "Use $paper-qa to answer questions about a prepared paper seminar folder using QA evidence."
