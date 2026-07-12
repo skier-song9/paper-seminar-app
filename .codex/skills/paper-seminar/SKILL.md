@@ -37,8 +37,9 @@ Keep all figure links in `seminar.md` relative, for example `figures/method-p12.
 
 0. Check tool availability once, before any other step.
    - Run `command -v pdftoppm` to check Poppler. If missing, do not fail: skip
-     deterministic page capture and rely on Codex's PDF preview for visual
-     inspection, and note in the final report that figure extraction was limited.
+     deterministic page capture and rely on the harness's PDF preview for
+     visual inspection, and note in the final report that figure extraction
+     was limited.
    - Run `python3 -c "import pypdf"` to check pypdf. If missing, the workspace
      script still works but cannot guess the folder name from the PDF; always
      pass `--title` in that case.
@@ -68,7 +69,7 @@ Keep all figure links in `seminar.md` relative, for example `figures/method-p12.
      survey/series template variant when the paper covers many works.
 4. Extract visuals.
    - Select only visuals needed for understanding: task/problem diagram, model/pipeline, algorithm, main result table, ablation, qualitative examples.
-   - Prefer Codex's PDF preview when available for visual inspection.
+   - Prefer the harness's built-in PDF preview when available for visual inspection.
    - For deterministic page capture, use bundled Poppler directly:
      `pdftoppm -png -singlefile -f 7 -l 7 -r 180 paper.pdf figures/paper-p007`.
    - For cropped capture, never guess crop coordinates. Follow this order:
@@ -91,7 +92,7 @@ Keep all figure links in `seminar.md` relative, for example `figures/method-p12.
    - The template labels `메타데이터`, `학습 목표`, `이 자료에서 보는 한계` are
      present and unchanged.
    - No temporary or unreferenced files remain in the paper folder.
-7. During Q&A, use `$paper-qa`.
+7. During Q&A, use the `paper-qa` skill.
    - Ground answers in `QA/` evidence created under the paper folder.
    - If a point stays ambiguous, restate it with a smaller example, a diagram-level explanation, or equations.
    - Add useful Q&A notes back into `seminar.md` when the discussion changes the understanding.
