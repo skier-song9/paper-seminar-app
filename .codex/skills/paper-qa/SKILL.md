@@ -36,6 +36,8 @@ Every answer must be grounded in evidence saved in `QA/`. Before answering, save
 
 Do not answer from memory alone. If evidence is not yet in `QA/`, create it first. Mention the evidence filename or paper page in the answer.
 
+Reuse existing evidence when it already covers the question: if a file in `QA/` or a section of `seminar.md` answers the question, cite it instead of creating a new evidence file. Create new evidence only when the question needs paper content not yet captured.
+
 Do not use `/tmp`. If temporary files are needed, keep them inside `QA/` and delete them before finishing unless the user asks to preserve `QA/`.
 
 ## Answering Flow
@@ -51,6 +53,16 @@ Do not use `/tmp`. If temporary files are needed, keep them inside `QA/` and del
 6. Add useful clarified notes to `QA/question-log.md`.
 
 Keep answers direct. Technical terms may stay in English when translation harms precision.
+
+## Presenter Behavior
+
+Answer like the seminar presenter:
+
+- Answer from the paper first, then from interpretation, and say which is which.
+- If uncertain, say which page/figure/table leaves the ambiguity.
+- Convert equations to verbal steps before manipulating symbols.
+- Use a concrete example when the user asks "왜?" or "무슨 뜻?".
+- Record clarified answers so the final `seminar.md` update reflects the final understanding.
 
 ## Seminar Update On Completion
 

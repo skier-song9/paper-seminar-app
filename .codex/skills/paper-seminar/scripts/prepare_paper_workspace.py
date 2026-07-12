@@ -9,16 +9,23 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 
+# New-style id: 2401.12345[v2]. Old-style id keeps its category prefix: cs/0301012[v2].
+ARXIV_ID = r"(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[A-Z]{2})?/\d{7})(?:v\d+)?"
+
+
 def arxiv_pdf_url(value: str) -> str:
     value = value.strip()
-    if re.fullmatch(r"\d{4}\.\d{4,5}(v\d+)?", value):
+    if re.fullmatch(ARXIV_ID, value):
         return f"https://arxiv.org/pdf/{value}"
     parsed = urlparse(value)
     if "arxiv.org" not in parsed.netloc:
         return value
-    paper_id = parsed.path.rstrip("/").split("/")[-1]
     if "/pdf/" in parsed.path:
         return value
+    segments = [s for s in parsed.path.split("/") if s]
+    if not segments:
+        return value
+    paper_id = "/".join(segments[1:]) if len(segments) > 1 else segments[0]
     return f"https://arxiv.org/pdf/{paper_id}"
 
 
@@ -31,7 +38,14 @@ def slugify(title: str) -> str:
 def guess_title_from_pdf(path: Path) -> str:
     try:
         from pypdf import PdfReader
-
+    except ImportError:
+        print(
+            "warning: pypdf is not installed; the folder name falls back to the "
+            "input file name. Install pypdf or pass --title for a better name.",
+            file=sys.stderr,
+        )
+        return path.stem
+    try:
         reader = PdfReader(str(path))
         meta_title = (reader.metadata or {}).get("/Title")
         if meta_title and len(meta_title.strip()) > 5:
@@ -60,6 +74,11 @@ def main() -> int:
     parser.add_argument("input", help="Local PDF path, arXiv id, arXiv URL, or PDF URL")
     parser.add_argument("--output", default="seminars", help="Directory where paper folders are created")
     parser.add_argument("--title", help="Short or full paper title for folder naming")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite paper.pdf if the target folder already has one",
+    )
     args = parser.parse_args()
 
     output = Path(args.output).expanduser().resolve()
@@ -74,6 +93,12 @@ def main() -> int:
     folder.mkdir(parents=True, exist_ok=True)
     partial_pdf = folder / ".paper-download.partial.pdf"
     paper_pdf = folder / "paper.pdf"
+
+    if paper_pdf.exists() and not args.force:
+        raise SystemExit(
+            f"refusing to overwrite existing {paper_pdf}; "
+            "pass --force to replace it, or use --title to pick another folder name"
+        )
 
     if Path(source).expanduser().exists():
         shutil.copyfile(source_path.resolve(), paper_pdf)
@@ -93,6 +118,11 @@ def main() -> int:
             folder.rename(guessed_folder)
             folder = guessed_folder
             paper_pdf = folder / "paper.pdf"
+        elif guessed_folder != folder:
+            print(
+                f"note: {guessed_folder} already exists; keeping {folder}",
+                file=sys.stderr,
+            )
 
     (folder / "figures").mkdir(exist_ok=True)
 
